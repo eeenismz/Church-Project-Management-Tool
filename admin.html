@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Church Project Manager - Admin</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <!-- Ionicons for icons -->
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+</head>
+<body class="flex-center" style="min-height: 100vh;">
+
+    <!-- Login View -->
+    <section id="login-view" class="container" style="max-width: 400px;">
+        <div class="glass-card fade-in">
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <h2 style="color: var(--primary-color);">Admin Access</h2>
+                <p>Manage your church projects</p>
+            </div>
+            <form id="login-form">
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" id="email" class="form-input" placeholder="admin@church.com" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" id="password" class="form-input" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                    Log In <ion-icon name="log-in-outline"></ion-icon>
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Dashboard View (Hidden by default) -->
+    <section id="dashboard-view" style="display: none; width: 100%; min-height: 100vh;">
+        <!-- Navbar -->
+        <nav class="glass-card" style="margin: 1rem 2rem; padding: 1rem 2rem; border-radius: var(--radius-md);">
+            <div class="flex-between">
+                <h3 style="color: var(--primary-color); display: flex; align-items: center; gap: 0.5rem;">
+                    <ion-icon name="grid-outline"></ion-icon> Projects Dashboard
+                </h3>
+                <div class="flex-center" style="gap: 1rem;">
+                    <span id="user-email" style="font-size: 0.9rem; color: var(--text-secondary);"></span>
+                    <button id="logout-btn" class="btn btn-outline btn-sm">
+                        Log Out <ion-icon name="log-out-outline"></ion-icon>
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="container" style="max-width: 1400px;">
+            <div class="flex-between" style="margin-bottom: 2rem;">
+                <div>
+                    <h2>Active Projects</h2>
+                    <p>Overview of all fundraising activities</p>
+                </div>
+                <button id="add-project-btn" class="btn btn-primary">
+                    <ion-icon name="add-circle-outline"></ion-icon> New Project
+                </button>
+            </div>
+
+            <!-- Projects Grid -->
+            <div id="projects-grid" class="grid-cols-3">
+                <!-- Project Cards will be injected here -->
+                <div class="glass-card flex-center" style="min-height: 200px; color: var(--text-muted);">
+                    <p>Loading projects...</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Project Modal (Create/Edit) -->
+    <div id="project-modal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 100; backdrop-filter: blur(5px); background: rgba(0,0,0,0.4);">
+        <div class="flex-center" style="height: 100%; padding: 2rem;">
+            <!-- Widened Modal -->
+            <div class="glass-card no-hover" style="width: 100%; max-width: 1200px; height: 90vh; display: flex; flex-direction: column; background: var(--bg-color);">
+                
+                <div class="flex-between" style="margin-bottom: 1.5rem; flex-shrink: 0;">
+                    <h3 id="modal-title">Create New Project</h3>
+                    <button id="close-modal-btn" style="background:none; border:none; font-size: 1.5rem; cursor: pointer;">
+                        <ion-icon name="close-outline"></ion-icon>
+                    </button>
+                </div>
+                
+                <form id="project-form" style="display: contents;"> <!-- Use contents to let grid work if needed, or just flex grow -->
+                    <input type="hidden" id="project-id"> <!-- Hidden ID for edits -->
+                    
+                    <div class="modal-grid" style="flex-grow: 1; overflow-y: auto; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 2rem; padding-right: 1rem;">
+                        
+                        <!-- Column 1: Project Info -->
+                        <div class="col-info">
+                            <h4 style="margin-bottom: 1rem; color: var(--primary-color);">1. Project Info</h4>
+                            <div class="form-group">
+                                <label class="form-label">Project Name</label>
+                                <input type="text" id="p-name" class="form-input" placeholder="e.g. New Church Building" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Type</label>
+                                <select id="p-type" class="form-select">
+                                    <option value="target">Fixed Target</option>
+                                    <option value="open">Open Ended</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Theme Color</label>
+                                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                                    <input type="color" id="p-color" class="form-input" value="#6366f1" style="height: 48px; width: 60px; padding: 0;">
+                                    <span style="font-size: 0.8rem; color: var(--text-muted);">Select main theme color</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Target Amount (THB)</label>
+                                <!-- Changed to text for comma formatting -->
+                                <input type="text" id="p-target" class="form-input money-input" placeholder="0 if open ended">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Start Date</label>
+                                <input type="date" id="p-start" class="form-input" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">End Date</label>
+                                <input type="date" id="p-end" class="form-input">
+                            </div>
+                        </div>
+
+                        <!-- Column 2: Payment & Images -->
+                        <div class="col-payment">
+                            <h4 style="margin-bottom: 1rem; color: var(--primary-color);">2. Payment & Media</h4>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Raised Amount (THB)</label>
+                                <input type="text" id="p-current" class="form-input money-input" placeholder="0" value="0">
+                                <small style="color: var(--text-muted);">Update this to add funds</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Bank Name / Details</label>
+                                <input type="text" id="p-bank-name" class="form-input" placeholder="e.g. KBank 123-4-56789-0">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Cover Image</label>
+                                <input type="file" id="p-image-file" class="form-input" accept="image/*">
+                                <div id="image-preview" style="margin-top: 0.5rem; height: 150px; background-color: #eee; border-radius: 8px; background-size: cover; background-position: center; display: none;"></div>
+                                <input type="hidden" id="p-image-base64">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">QR Code Image (Optional)</label>
+                                <input type="file" id="p-qr-file" class="form-input" accept="image/*">
+                                <div id="qr-preview" style="margin-top: 0.5rem; height: 100px; width: 100px; background-color: #eee; border-radius: 8px; background-size: cover; background-position: center; display: none;"></div>
+                                <input type="hidden" id="p-qr-base64">
+                            </div>
+                        </div>
+
+                        <!-- Column 3: Activity Log -->
+                        <div class="col-history" style="border-left: 1px solid #e2e8f0; padding-left: 1.5rem;">
+                            <h4 style="margin-bottom: 1rem; color: var(--primary-color);">3. Activity Log</h4>
+                            <div id="activity-log-container" style="display: flex; flex-direction: column; gap: 0.75rem; max-height: 100%; overflow-y: auto;">
+                                <p style="color: var(--text-muted); font-size: 0.9rem;">History will appear here for existing projects.</p>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #e2e8f0; flex-shrink: 0;">
+                        <button type="button" id="cancel-modal-btn" class="btn btn-outline">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Project</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="assets/js/admin.js"></script>
+</body>
+</html>
